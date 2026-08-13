@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prayer BD</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f7f5;color:#17231d}
+header{background:#075e45;color:#fff;padding:20px;text-align:center}header h1{margin:0}header p{margin:6px 0 0}
+.container{max-width:680px;margin:auto;padding:15px}.card{background:#fff;border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 4px 18px #0001}
+.hidden{display:none!important}input,select{width:100%;padding:13px;margin:7px 0;border:1px solid #ddd;border-radius:10px;font-size:15px}
+button{border:0;border-radius:10px;padding:12px 16px;cursor:pointer}.primary{background:#075e45;color:#fff}.success{background:#16833b;color:#fff}.danger{background:#d93025;color:#fff}.secondary{background:#e8f2ee;color:#075e45}
+.device{background:#fff7d6;border:1px solid #e8d26c;padding:15px;border-radius:12px}.device-id{font-weight:bold;font-size:18px;word-break:break-all;margin-top:7px}
+.status{font-weight:bold;font-size:18px;margin:12px 0}.prayer{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #eee}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.big{font-size:52px;text-align:center;color:#075e45;margin:20px}.admin-item{border:1px solid #ddd;border-radius:12px;padding:13px;margin:10px 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f3f7f5;border-radius:12px;padding:14px;text-align:center}.stat b{display:block;font-size:25px;margin-top:5px}
+.small{font-size:12px;color:#666}.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+</style>
+</head>
+<body>
+<header><h1>🕌 Prayer BD</h1><p>নামাজ ও ইসলামিক অ্যাপ</p></header>
+<div class="container">
+
+<section id="deviceScreen"><div class="card">
+<h2>🔐 Device Verification</h2>
+<div class="device">আপনার Device ID:<div id="deviceIdText" class="device-id">Loading...</div></div>
+<div id="deviceStatus" class="status">Checking...</div><p id="deviceMessage"></p>
+<button class="primary" onclick="checkDevice()">🔄 Check Again</button>
+</div></section>
+
+<section id="userApp" class="hidden">
+<div class="card"><h2>📍 জেলা নির্বাচন</h2>
+<select id="districtSelect" onchange="loadPrayerTimes()">
+<option value="Dhaka">ঢাকা</option><option value="Chattogram">চট্টগ্রাম</option><option value="Rajshahi">রাজশাহী</option><option value="Khulna">খুলনা</option><option value="Barishal">বরিশাল</option><option value="Sylhet">সিলেট</option><option value="Rangpur">রংপুর</option><option value="Mymensingh">ময়মনসিংহ</option>
+</select></div>
+
+<div class="card"><h2>🕌 আজকের নামাজের সময়</h2>
+<div class="prayer"><span>ফজর</span><b id="fajr">--:--</b></div><div class="prayer"><span>সূর্যোদয়</span><b id="sunrise">--:--</b></div>
+<div class="prayer"><span>যোহর</span><b id="dhuhr">--:--</b></div><div class="prayer"><span>আসর</span><b id="asr">--:--</b></div>
+<div class="prayer"><span>মাগরিব</span><b id="maghrib">--:--</b></div><div class="prayer"><span>এশা</span><b id="isha">--:--</b></div>
+</div>
+
+<div class="card"><h2>🚫 নিষিদ্ধ সময়</h2>
+<div class="prayer"><span>সূর্যোদয়</span><b id="forbidden1">--</b></div><div class="prayer"><span>জাওয়াল (আনুমানিক)</span><b id="forbidden2">--</b></div><div class="prayer"><span>সূর্যাস্ত</span><b id="forbidden3">--</b></div>
+</div>
+
+<div class="card"><h2>✨ ইসলামিক Tools</h2><div class="grid">
+<button class="secondary" onclick="showTool('qibla')">🧭 Qibla</button><button class="secondary" onclick="showTool('tasbih')">📿 Tasbih</button><button class="secondary" onclick="showTool('dua')">🤲 Dua</button>
+</div></div>
+
+<div id="qibla" class="card hidden"><h2>🧭 Qibla</h2><button class="primary" onclick="findQibla()">🧭 Find Qibla</button><h2 id="qiblaResult"></h2></div>
+<div id="tasbih" class="card hidden"><h2>📿 Tasbih Counter</h2><div class="big" id="count">0</div><button class="success" style="width:100%" onclick="increaseTasbih()">📿 Tasbih</button><br><br><button class="danger" style="width:100%" onclick="resetTasbih()">Reset</button></div>
+<div id="dua" class="card hidden"><h2>🤲 ছোট দোয়া</h2><p><b>رَبِّ زِدْنِي عِلْمًا</b></p><p>হে আমার রব! আমার জ্ঞান বৃদ্ধি করুন।</p><hr><p><b>رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً</b></p><p>হে আমাদের রব! আমাদের দুনিয়াতে কল্যাণ দান করুন।</p></div>
+</section>
+
+<section id="adminLoginSection" class="hidden"><div class="card"><h2>👑 Admin Login</h2>
+<input id="loginEmailInput" type="email" placeholder="Admin Email"><input id="loginPasswordInput" type="password" placeholder="Password">
+<button class="primary" style="width:100%" onclick="doAdminLogin()">🔐 Login</button><p id="loginMessage"></p></div></section>
+
+<section id="adminPanel" class="hidden">
+<div class="card"><div class="topbar"><div><h2 style="margin:0">👑 Admin Dashboard</h2><p id="adminEmailDisplay" class="small"></p></div><button class="danger" onclick="doAdminLogout()">Logout</button></div></div>
+<div class="card"><h3>📊 Device Statistics</h3><div class="stats"><div class="stat">Total<b id="totalDevices">0</b></div><div class="stat">🟢 Active<b id="activeDevices">0</b></div><div class="stat">🔴 Inactive<b id="inactiveDevices">0</b></div></div></div>
+<div class="card"><h3>🔎 Search Device</h3><input id="searchDeviceInput" placeholder="BD-XXXXXXXXXXXX"><button class="primary" onclick="searchDevice()">🔎 Search</button><div id="deviceResult"></div></div>
+<div class="card"><div class="topbar"><h3>📋 All Devices</h3><button class="secondary" onclick="loadDevices()">🔄 Refresh</button></div><div id="deviceList">Loading...</div></div>
+</section>
+
+<div id="adminButtonWrap" style="text-align:center;margin:20px"><button class="secondary" onclick="openAdminLogin()">👑 Admin Login</button></div>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,updateDoc,collection,getDocs} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyAk6kZWPjKgqsYBCgU4T1oD5nVqJvW3grk",authDomain:"prayer-app-4d332.firebaseapp.com",projectId:"prayer-app-4d332",storageBucket:"prayer-app-4d332.firebasestorage.app",messagingSenderId:"1041665903232",appId:"1:1041665903232:web:0eb5a23065788136a4b465"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+
+function generateDeviceID(){let id=localStorage.getItem("prayerDeviceID");if(!id){id="BD-"+crypto.randomUUID().replaceAll("-","").substring(0,16).toUpperCase();localStorage.setItem("prayerDeviceID",id)}return id}
+const deviceID=generateDeviceID();$("deviceIdText").textContent=deviceID;
+
+window.checkDevice=async function(){
+const status=$("deviceStatus"),msg=$("deviceMessage");status.textContent="Checking...";msg.textContent="";
+try{const ref=doc(db,"devices",deviceID),snap=await getDoc(ref);
+if(!snap.exists()){await setDoc(ref,{deviceId:deviceID,active:false,createdAt:new Date().toISOString()});status.textContent="🔴 Not Activated";status.style.color="#d93025";msg.textContent="Admin Panel থেকে এই Device Activate করতে হবে।";return}
+if(snap.data().active===true){status.textContent="🟢 Activated";status.style.color="#16833b";msg.textContent="Device Active হয়েছে।";$("deviceScreen").classList.add("hidden");$("userApp").classList.remove("hidden");loadPrayerTimes()}
+else{status.textContent="🔴 Not Activated";status.style.color="#d93025";msg.textContent="Admin Panel থেকে এই Device Activate করতে হবে।"}
+}catch(e){status.textContent="⚠️ Firebase Error";msg.textContent=e.message}
+};
+
+window.openAdminLogin=function(){$("deviceScreen").classList.add("hidden");$("userApp").classList.add("hidden");$("adminPanel").classList.add("hidden");$("adminLoginSection").classList.remove("hidden");$("adminButtonWrap").classList.add("hidden");$("loginMessage").textContent=""};
+
+window.doAdminLogin=async function(){
+const email=$("loginEmailInput").value.trim(),password=$("loginPasswordInput").value,msg=$("loginMessage");
+if(!email||!password){msg.textContent="❌ Email এবং Password দিন।";return}
+msg.textContent="⏳ Login হচ্ছে...";
+try{const c=await signInWithEmailAndPassword(auth,email,password);showAdminPanel(c.user)}catch(e){msg.textContent="❌ Login failed: "+e.message}
+};
+
+function showAdminPanel(user){$("adminLoginSection").classList.add("hidden");$("deviceScreen").classList.add("hidden");$("userApp").classList.add("hidden");$("adminButtonWrap").classList.add("hidden");$("adminPanel").classList.remove("hidden");$("adminEmailDisplay").textContent="Admin: "+(user.email||"");loadDevices()}
+window.doAdminLogout=async function(){await signOut(auth);location.reload()};
+onAuthStateChanged(auth,user=>{if(user)showAdminPanel(user)});
+
+async function loadDevices(){
+const box=$("deviceList");box.textContent="⏳ Loading devices...";
+try{const snapshot=await getDocs(collection(db,"devices"));let total=0,active=0,inactive=0;box.innerHTML="";
+if(snapshot.empty)box.innerHTML="<p>কোনো Device এখনো পাওয়া যায়নি।</p>";
+snapshot.forEach(s=>{const d=s.data();total++;d.active?active++:inactive++;const item=document.createElement("div");item.className="admin-item";item.innerHTML="<b>📱 "+escapeHtml(d.deviceId||s.id)+"</b><p>Status: "+(d.active?"🟢 Active":"🔴 Inactive")+"</p>";const b=document.createElement("button");b.className=d.active?"danger":"success";b.textContent=d.active?"🔴 Deactivate":"🟢 Activate";b.onclick=()=>toggleDevice(s.id,!!d.active);item.appendChild(b);box.appendChild(item)});
+$("totalDevices").textContent=total;$("activeDevices").textContent=active;$("inactiveDevices").textContent=inactive;
+}catch(e){box.innerHTML='<p style="color:#d93025">❌ Firestore Error: '+escapeHtml(e.message)+'</p>'}
+}
+window.loadDevices=loadDevices;
+window.toggleDevice=async function(id,current){try{await updateDoc(doc(db,"devices",id),{active:!current});await loadDevices()}catch(e){alert("❌ Device update failed:\n"+e.message)}};
+
+window.searchDevice=async function(){const id=$("searchDeviceInput").value.trim(),box=$("deviceResult");if(!id){box.textContent="Device ID লিখুন।";return}box.textContent="⏳ Searching...";
+try{const s=await getDoc(doc(db,"devices",id));if(!s.exists()){box.textContent="❌ Device পাওয়া যায়নি।";return}const d=s.data();box.innerHTML="<div class='admin-item'><b>📱 "+escapeHtml(d.deviceId||id)+"</b><p>Status: "+(d.active?"🟢 Active":"🔴 Inactive")+"</p></div>";const b=document.createElement("button");b.className=d.active?"danger":"success";b.textContent=d.active?"🔴 Deactivate":"🟢 Activate";b.onclick=async()=>{await toggleDevice(id,!!d.active);searchDevice()};box.firstElementChild.appendChild(b)}catch(e){box.textContent="❌ "+e.message}};
+
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+let tasbihCount=parseInt(localStorage.getItem("tasbihCount")||"0");$("count").textContent=tasbihCount;
+window.increaseTasbih=()=>{$("count").textContent=++tasbihCount;localStorage.setItem("tasbihCount",tasbihCount)};
+window.resetTasbih=()=>{tasbihCount=0;$("count").textContent=0;localStorage.setItem("tasbihCount",0)};
+window.showTool=id=>{["qibla","tasbih","dua"].forEach(x=>$(x).classList.add("hidden"));$(id).classList.remove("hidden")};
+
+window.findQibla=()=>{if(!navigator.geolocation){$("qiblaResult").textContent="Location supported নয়";return}$("qiblaResult").textContent="⏳ Location নেওয়া হচ্ছে...";navigator.geolocation.getCurrentPosition(p=>{const lat=p.coords.latitude,lon=p.coords.longitude,ka=21.4225,ko=39.8262,r=d=>d*Math.PI/180,y=Math.sin(r(ko-lon)),x=Math.cos(r(lat))*Math.sin(r(ka))-Math.sin(r(lat))*Math.cos(r(ka))*Math.cos(r(ko-lon));let b=(Math.atan2(y,x)*180/Math.PI+360)%360;$("qiblaResult").textContent="🕋 Qibla Bearing: "+b.toFixed(1)+"°"},()=>$("qiblaResult").textContent="❌ Location permission দিন।")};
+
+const coords={Dhaka:[23.8103,90.4125],Chattogram:[22.3569,91.7832],Rajshahi:[24.3745,88.6042],Khulna:[22.8456,89.5403],Barishal:[22.701,90.3535],Sylhet:[24.8949,91.8687],Rangpur:[25.7439,89.2752],Mymensingh:[24.7471,90.4203]};
+window.loadPrayerTimes=async()=>{const [lat,lon]=coords[$("districtSelect").value],ts=Math.floor(Date.now()/1000);try{const r=await fetch(`https://api.aladhan.com/v1/timings/${ts}?latitude=${lat}&longitude=${lon}&method=1`),j=await r.json(),t=j.data.timings;["fajr","sunrise","dhuhr","asr","maghrib","isha"].forEach(x=>$(x).textContent=t[x.charAt(0).toUpperCase()+x.slice(1)]);$("forbidden1").textContent=t.Sunrise;$("forbidden2").textContent=t.Dhuhr;$("forbidden3").textContent=t.Sunset}catch(e){console.error(e)}};
+checkDevice();
+</script>
+</body>
+</html>
